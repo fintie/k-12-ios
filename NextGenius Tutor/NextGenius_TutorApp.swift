@@ -9,9 +9,18 @@ import SwiftUI
 
 @main
 struct NextGenius_TutorApp: App {
+    @StateObject private var authService = AuthService.shared
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if authService.isAuthenticated {
+                ContentView()
+                    .environmentObject(UserManager())
+            } else {
+                LoginView(onLoginSuccess: {
+                    // Handle successful login
+                })
+            }
         }
     }
 }

@@ -1,53 +1,90 @@
 import SwiftUI
 
 struct PostRowView: View {
+    @EnvironmentObject var userManager: UserManager
     let post: Post
 
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(.gray)
-                VStack(alignment: .leading) {
-                    Text(post.username)
-                        .font(.headline)
-                    Text(post.postDate, format: .relative(presentation: .named))
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
+        CardView {
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                // User info header
+                HStack {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.primary)
+                    VStack(alignment: .leading) {
+                        Text(post.username)
+                            .font(Typography.headline)
+                        Text(post.postDate, format: .relative(presentation: .named))
+                            .font(Typography.caption)
+                            .foregroundColor(.textSecondary)
+                    }
+                    Spacer()
                 }
-                Spacer()
+                
+                // Post content
+                Text(post.content)
+                    .font(Typography.body)
+                
+                // Code snippet (if any)
+                if let codeSnippet = post.codeSnippet {
+                    VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                        Text("Code Snippet:")
+                            .font(Typography.caption)
+                            .foregroundColor(.textSecondary)
+                        
+                        Text(codeSnippet)
+                            .font(.system(.caption, design: .monospaced))
+                            .padding(8)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(CornerRadius.small)
+                    }
+                }
+                
+                // Interaction buttons
+                Divider()
+                
+                HStack(spacing: Spacing.large) {
+                    Button(action: {
+                        // Handle like action
+                    }) {
+                        HStack(spacing: Spacing.extraSmall) {
+                            Image(systemName: post.likes.contains(userManager.currentUser.id) ? "hand.thumbsup.fill" : "hand.thumbsup")
+                            Text("\(post.likes.count)")
+                        }
+                        .font(Typography.caption)
+                        .foregroundColor(post.likes.contains(userManager.currentUser.id) ? .primary : .textSecondary)
+                    }
+                    
+                    Button(action: {
+                        // Handle comment action
+                    }) {
+                        HStack(spacing: Spacing.extraSmall) {
+                            Image(systemName: "bubble.left.and.bubble.right")
+                            Text("\(post.comments.count) Comments")
+                        }
+                        .font(Typography.caption)
+                        .foregroundColor(.textSecondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        // Handle share action
+                    }) {
+                        Image(systemName: "square.and.arrow.up")
+                            .font(Typography.caption)
+                            .foregroundColor(.textSecondary)
+                    }
+                }
             }
-            .padding(.bottom, 5)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
 
-            Text(post.content)
-                .font(.body)
-                .padding(.bottom, 5)
-
-            if let codeSnippet = post.codeSnippet {
-                Text("Code Snippet:")
-                    .font(.subheadline)
-                    .padding(.bottom, 2)
-                Text(codeSnippet)
-                    .font(.footnote)
-                    .fontDesign(.monospaced)
-                    .padding(8)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(5)
-                    .padding(.bottom, 5)
-            }
-
-            HStack {
-                Image(systemName: "hand.thumbsup.fill")
-                    .foregroundColor(.blue)
-                Text("\(post.likes.count)")
-                Spacer()
-                Image(systemName: "bubble.left.and.bubble.right.fill")
-                    .foregroundColor(.green)
-                Text("\(post.comments.count)")
-            }
-            .font(.caption)
+struct PostRowView_Previews: PreviewProvider {
             .foregroundColor(.gray)
         }
         .padding(.vertical, 8)
